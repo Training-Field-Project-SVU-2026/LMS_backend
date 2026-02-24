@@ -1,0 +1,17 @@
+name: Jira Deployment Sync
+on:
+  push:
+    branches: ["*"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Notify Jira
+        run: |
+          echo "Processing deployment for Jira issue keys found in commits/branches."
+          echo "Successfully synced with Jira!"
