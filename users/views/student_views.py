@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from users.models import User,Student
 from users.serializers import StudentSerializer, StudentUpdateSerializer, StudentUpdateSerializer
-
+#=====================all students=========================
 class StudentListView(APIView):
     def get(self, request):
         students = Student.objects.select_related("user").all()

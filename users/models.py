@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.text import slugify
@@ -37,6 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+    ## for email verification
     verification_token = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -44,7 +47,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []  
 
-    objects = UserManager()  
+    objects = UserManager() 
+   
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -69,3 +73,12 @@ class Instructor(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - Instructor"
+    
+class PasswordResetOtp(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def is_expired(self):
+        return (timezone.now() - self.created_at).total_seconds() > 300
+    def __str__(self):
+        return f"{self.email} - OTP: {self.otp}"
