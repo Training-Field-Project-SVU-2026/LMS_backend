@@ -20,8 +20,6 @@ class StudentRegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name'],
             role='student'
         )
-        student_profile = Student.objects.create(user=user)
-        user.slug = student_profile.slug
         user.save()
         return user
     

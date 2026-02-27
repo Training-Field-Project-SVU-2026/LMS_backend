@@ -103,14 +103,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE':'django.db.backends.mysql',
+#         'NAME': os.getenv('MYSQLDATABASE'),
+#         'USER': os.getenv('MYSQLUSER','root'),
+#         'PASSWORD': os.getenv('MYSQLPASSWORD'),
+#         'HOST': os.getenv('MYSQLHOST','localhost'),
+#         'PORT': os.getenv('MYSQLPORT','3306'),
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQLDATABASE'),
-        'USER': os.getenv('MYSQLUSER','root'),
-        'PASSWORD': os.getenv('MYSQLPASSWORD'),
-        'HOST': os.getenv('MYSQLHOST','localhost'),
-        'PORT': os.getenv('MYSQLPORT','3306'),
+        'NAME': 'lms_backend',
+        'USER': 'root',
+        'PASSWORD': 'root1234',
+        'HOST': 'database-1.ci7q0qocups7.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
