@@ -1,9 +1,12 @@
 
+from django.conf import settings
 from rest_framework import serializers
 from .models import PasswordResetOtp, User, Student,Instructor
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.core.mail import send_mail 
+from django.utils.crypto import get_random_string
+ 
 class StudentRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     role = serializers.CharField(read_only=True)  
@@ -21,6 +24,7 @@ class StudentRegisterSerializer(serializers.ModelSerializer):
             role='student'
         )
         user.save()
+        student= Student.objects.create(user=user)
         return user
     
     
@@ -135,6 +139,55 @@ class InstructorUpdateSerializer(serializers.ModelSerializer):
         instance.description = validated_data.get('description', instance.description)
         instance.save()
         return instance
+    
+    
+#=====================create instructor========================
+
+class InstructorCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+    # validate email
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def create(self, validated_data):
+        password = get_random_string(length=8)
+
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            role='instructor',
+            password=password
+        )
+        user.is_verified = True
+        user.save()
+
+        instructor = Instructor.objects.create(user=user)
+
+        send_mail(
+            subject="Instructor Account Created",
+            message=f"""
+Hello {user.first_name},
+
+Your instructor account has been created.
+
+Email: {user.email}
+Temporary Password: {password}
+
+Please change your password after login.
+""",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email]
+        )
+
+        return instructor
+    
     
 # ================= Forget Password Serializer =================
 class ForgetPasswordSerializer(serializers.Serializer):
